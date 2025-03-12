@@ -5,7 +5,7 @@
 Alpine Llama is a toolkit designed for fine-tuning large language models with a focus on efficient, flexible model adaptation. While the base implementation focuses on web component creation, it can be modified to work more generically with minimal adjustment to the UI's JavaScript.
 
 <p align="center">
-  <img src="logo.png" width="300" style="border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+  <img src="logo.png" width="300" alt="Logo" style="border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: block; margin: 0 auto;" />
 </p>
 
 ## Core Fine-Tuning Capabilities
