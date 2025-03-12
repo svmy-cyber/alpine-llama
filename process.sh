@@ -1277,58 +1277,88 @@ execute_model() {
     # Start web server
     start_configure_webserver
     
-    # List available models and look for fine-tuned ones (models with '-ft' in their name)
+    # List all available models from ollama
     echo "Fetching available models..."
     local all_models=$(ollama list | grep -v "^NAME" | awk '{print $1}')
-    local available_models=$(echo "$all_models" | grep -E '.*-ft.*')
     
-    if [[ -z "${available_models}" ]]; then
-        print_error "No fine-tuned models found. Please run fine-tuning first."
-        # Don't return yet - still show available models
-        echo "Available models are:"
-        local ollama_models=("llama3.3" "qwq" "mistral" "qwen2.5-coder:32b" "codellama:70b" "dolphin3-r1" "deepseek-coder-v2")
-        for i in "${!ollama_models[@]}"; do
-            echo "$((i+1)). ${ollama_models[$i]}"
-        done
-        
-        read -p "Enter your choice (1-${#ollama_models[@]}, default: 1): " choice
-        choice=${choice:-1}
-        
-        # Validate input
-        if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt "${#ollama_models[@]}" ]; then
-            print_error "Invalid selection. Using default: ${ollama_models[0]}"
-            choice=1
-        fi
-        
-        model_name="${ollama_models[$((choice-1))]}"
-    else
-        echo "Available fine-tuned models:"
-        echo "${available_models}"
-        
-        # Convert to array for selection
-        readarray -t ft_models <<< "$available_models"
-        for i in "${!ft_models[@]}"; do
-            # Trim whitespace
-            ft_models[$i]=$(echo "${ft_models[$i]}" | xargs)
-            echo "$((i+1)). ${ft_models[$i]}"
-        done
-        
-        read -p "Enter your choice (1-${#ft_models[@]}, default: 1): " choice
-        choice=${choice:-1}
-        
-        # Validate input
-        if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt "${#ft_models[@]}" ]; then
-            print_error "Invalid selection. Using default: ${ft_models[0]}"
-            choice=1
-        fi
-        
-        model_name="${ft_models[$((choice-1))]}"
+    if [[ -z "${all_models}" ]]; then
+        print_error "No models found. Please pull models using 'ollama pull <model_name>' first."
+        return 1
     fi
     
-    print_progress "Starting CLI interface for model: ${model_name}"
+    # Separate models into fine-tuned and base models
+    local fine_tuned_models=$(echo "$all_models" | grep -E '.*-ft.*')
+    local base_models=$(echo "$all_models" | grep -v -E '.*-ft.*')
+    
+    # Display all models with clear separation
     echo ""
     echo "========================================"
-    echo "CLI Interface for ${model_name}"
+    echo "AVAILABLE MODELS:"
+    echo "========================================"
+    
+    # Display fine-tuned models first if available
+    if [[ ! -z "${fine_tuned_models}" ]]; then
+        echo ""
+        echo "FINE-TUNED MODELS:"
+        echo "----------------------------------------"
+        readarray -t ft_models_array <<< "$fine_tuned_models"
+        for i in "${!ft_models_array[@]}"; do
+            # Trim whitespace
+            ft_models_array[$i]=$(echo "${ft_models_array[$i]}" | xargs)
+            echo "$((i+1)). ${ft_models_array[$i]} [FINE-TUNED]"
+        done
+        
+        local ft_count=${#ft_models_array[@]}
+    else
+        echo "No fine-tuned models available."
+        local ft_count=0
+    fi
+    
+    # Display base models
+    echo ""
+    echo "BASE MODELS:"
+    echo "----------------------------------------"
+    readarray -t base_models_array <<< "$base_models"
+    for i in "${!base_models_array[@]}"; do
+        # Trim whitespace
+        base_models_array[$i]=$(echo "${base_models_array[$i]}" | xargs)
+        echo "$((ft_count+i+1)). ${base_models_array[$i]}"
+    done
+    
+    # Combined array for selection
+    local all_models_array=()
+    if [[ $ft_count -gt 0 ]]; then
+        all_models_array=("${ft_models_array[@]}" "${base_models_array[@]}")
+    else
+        all_models_array=("${base_models_array[@]}")
+    fi
+    
+    local total_models=${#all_models_array[@]}
+    
+    echo ""
+    echo "========================================"
+    read -p "Enter your choice (1-${total_models}, default: 1): " choice
+    choice=${choice:-1}
+    
+    # Validate input
+    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt "${total_models}" ]; then
+        print_error "Invalid selection. Using default: ${all_models_array[0]}"
+        choice=1
+    fi
+    
+    model_name="${all_models_array[$((choice-1))]}"
+    
+    # Determine if selected model is fine-tuned
+    if [[ $choice -le $ft_count ]]; then
+        model_type="FINE-TUNED"
+    else
+        model_type="BASE"
+    fi
+    
+    print_progress "Starting CLI interface for model: ${model_name} [${model_type}]"
+    echo ""
+    echo "========================================"
+    echo "CLI Interface for ${model_name} [${model_type}]"
     echo "Type 'exit' to quit"
     echo "========================================"
     echo ""
