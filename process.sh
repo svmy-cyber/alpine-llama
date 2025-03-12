@@ -471,6 +471,7 @@ setup() {
     # Install Ollama
     print_progress "Installing Ollama"
     if ! command -v ollama &> /dev/null; then
+        # First attempt: Download binary from ollama.com
         local ollama_file="${VENDOR_CACHE_DIR}/ollama-linux-amd64"
         
         if [[ ! -f "${ollama_file}" ]]; then
@@ -479,9 +480,16 @@ setup() {
         
         sudo_cmd "install -m 755 ${ollama_file} /usr/local/bin/ollama"
         
+        # Second attempt: Use the official install script if first method fails
         if ! command -v ollama &> /dev/null; then
-            print_error "Failed to install Ollama"
-            return 1
+            print_warning "Binary installation failed, trying install script..."
+            curl -fsSL https://ollama.ai/install.sh | sh
+            
+            # Final check
+            if ! command -v ollama &> /dev/null; then
+                print_error "Failed to install Ollama using both methods"
+                return 1
+            fi
         fi
     else
         print_success "Ollama is already installed"
