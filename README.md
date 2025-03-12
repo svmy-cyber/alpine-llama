@@ -76,7 +76,7 @@ Alpine Llama is a toolkit designed for fine-tuning large language models with a 
 ### Setup
 ```bash
 # Clone repository
-git clone https://github.com/
+git clone https://github.com/svmy-cyber/alpine-llama
 cd alpine-llama
 
 # Make scripts executable
