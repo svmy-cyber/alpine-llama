@@ -494,6 +494,25 @@ setup() {
     else
         print_success "Ollama is already installed"
     fi
+
+    # Start Ollama service
+    print_progress "Starting Ollama service"
+    if pgrep -x "ollama" > /dev/null; then
+        print_success "Ollama service is already running"
+    else
+        # Start in background and disown to keep it running after script ends
+        nohup ollama serve > /dev/null 2>&1 &
+        
+        # Give it a moment to start
+        sleep 2
+        
+        # Verify it's running
+        if pgrep -x "ollama" > /dev/null; then
+            print_success "Ollama service started successfully"
+        else
+            print_warning "Failed to start Ollama service automatically. Start manually with: ollama serve"
+        fi
+    fi
     
     # Create the fine-tuning Python script
     create_finetune_script
