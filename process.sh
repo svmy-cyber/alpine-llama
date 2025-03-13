@@ -1304,6 +1304,41 @@ execute_model() {
     # Start web server
     start_configure_webserver
     
+    # Launch web browser function
+    launch_web_browser() {
+        local web_port=${WEB_SERVER_PORT:-8080}
+        local web_url="http://localhost:${web_port}"
+        
+        # Check if running in WSL
+        if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
+            # WSL-specific browser launch using Windows host
+            if command -v powershell.exe > /dev/null; then
+                # Preferred method: PowerShell
+                powershell.exe -Command "Start-Process '$web_url'"
+            elif command -v cmd.exe > /dev/null; then
+                # Fallback to cmd.exe
+                cmd.exe /c start "$web_url"
+            else
+                echo "Cannot launch browser in Windows from WSL"
+                return 1
+            fi
+        else
+            # Standard Linux browser launch
+            if command -v xdg-open > /dev/null; then
+                xdg-open "$web_url"
+            elif command -v gnome-open > /dev/null; then
+                gnome-open "$web_url"
+            elif command -v kde-open > /dev/null; then
+                kde-open "$web_url"
+            else
+                echo "Could not detect a web browser to launch"
+            fi
+        fi
+    }
+    
+    # Launch browser after web server starts
+    launch_web_browser
+    
     # List all available models from ollama
     echo "Fetching available models..."
     local all_models=$(ollama list | grep -v "^NAME" | awk '{print $1}')
@@ -1844,7 +1879,7 @@ start_configure_webserver() {
 
     # Start Python Server with Error Handling
     log "Starting Python server"
-    # Kill any existing Python server on port 8000
+    # Kill any existing Python server on port 8080
     pkill -f "python.*server.py" || true
     
     # Start the custom Python server
@@ -1857,14 +1892,14 @@ start_configure_webserver() {
     # Verify server started
     sleep 2
     if ps -p $SERVER_PID > /dev/null; then
-        log "Python server started successfully with PID $SERVER_PID on port 8000"
-        print_success "Web server is running on port 8000"
+        log "Python server started successfully with PID $SERVER_PID on port 8080"
+        print_success "Web server is running on port 8080"
         
         # Print IP addresses for access
         echo "You can access the web interface at:"
         ip_addresses=$(hostname -I)
         for ip in $ip_addresses; do
-            echo "http://${ip}:8000"
+            echo "http://${ip}:8080"
         done
         
         # Log service statuses
@@ -1898,7 +1933,7 @@ import sys
 from urllib.parse import urlparse, parse_qs
 
 # Configuration
-PORT = 8001
+PORT = 8080
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 EXAMPLES_FILE = os.path.join(DATA_DIR, "examples.json")
 
