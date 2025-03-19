@@ -2063,6 +2063,7 @@ create_web_interface() {
     cat > "${SCRIPT_DIR}/index.html" << 'EOL'
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2098,6 +2099,7 @@ create_web_interface() {
         }
     </script>
 </head>
+
 <body class="bg-dark-bg-primary text-dark-text-primary font-sans h-screen overflow-hidden dark" x-data="app">
     <div class="flex h-screen">
         <!-- Top control bar -->
@@ -2105,25 +2107,29 @@ create_web_interface() {
             <!-- Header with controls -->
             <div class="bg-dark-bg-secondary border-b border-dark-border p-4 flex flex-wrap gap-4 items-center">
                 <div class="text-2xl font-bold text-primary mr-4">Ollama</div>
-                
+
                 <div class="flex items-center gap-2">
-                    <input type="text" id="server-url" x-model="baseUrl" placeholder="Ollama Server URL" 
+                    <input type="text" id="server-url" x-model="baseUrl" placeholder="Ollama Server URL"
                         class="bg-dark-bg-tertiary border border-dark-border text-dark-text-primary p-2 rounded text-sm w-64">
-                    <button @click="fetchModels()" class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded flex items-center gap-2 transition-colors">
+                    <button @click="fetchModels()"
+                        class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded flex items-center gap-2 transition-colors">
                         <i class="fas fa-plug"></i>
                         Connect
                     </button>
                 </div>
-                
+
                 <div class="flex-grow"></div>
-                
+
                 <!-- Model selection area with checkboxes -->
                 <div class="flex items-center gap-2">
                     <span class="text-primary font-semibold">Models (Max 6):</span>
-                    <div id="model-checkboxes" class="flex flex-wrap gap-3 bg-dark-bg-tertiary border border-dark-border p-2 rounded">
+                    <div id="model-checkboxes"
+                        class="flex flex-wrap gap-3 bg-dark-bg-tertiary border border-dark-border p-2 rounded">
                         <template x-if="loadingModels">
                             <div class="flex items-center">
-                                <div class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2"></div>
+                                <div
+                                    class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2">
+                                </div>
                                 <span>Loading models...</span>
                             </div>
                         </template>
@@ -2132,18 +2138,18 @@ create_web_interface() {
                         </template>
                         <template x-for="model in models" :key="model.name">
                             <div class="flex items-center">
-                                <input type="checkbox" :id="'model-' + model.name" :value="model.name" 
-                                    @change="updateModelSelection($event)" 
+                                <input type="checkbox" :id="'model-' + model.name" :value="model.name"
+                                    @change="updateModelSelection($event)"
                                     class="mr-2 model-checkbox w-4 h-4 accent-primary">
-                                <label :for="'model-' + model.name" :title="'Size: ' + model.size" 
-                                    class="text-dark-text-primary cursor-pointer hover:text-primary transition-colors" 
+                                <label :for="'model-' + model.name" :title="'Size: ' + model.size"
+                                    class="text-dark-text-primary cursor-pointer hover:text-primary transition-colors"
                                     x-text="model.name"></label>
                             </div>
                         </template>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Message input area - Reorganized to horizontal layout -->
             <div class="bg-dark-bg-secondary p-4 border-b border-dark-border">
                 <!-- Unified input row -->
@@ -2154,36 +2160,37 @@ create_web_interface() {
                             <i class="fas fa-chevron-up mr-2"></i>
                             <span>Preamble</span>
                         </div>
-                        <textarea id="preamble-input" x-model="preamble" placeholder="Enter preamble..." rows="6" 
+                        <textarea id="preamble-input" x-model="preamble" placeholder="Enter preamble..." rows="6"
                             :disabled="selectedModels.length === 0"
                             class="w-full bg-dark-bg-tertiary text-dark-text-primary border border-dark-border p-3 rounded-lg resize-none text-base leading-relaxed shadow-inner focus:ring-2 focus:ring-primary focus:outline-none transition-all h-64"></textarea>
                     </div>
-                    
+
                     <!-- Main message input - doubled height from h-24 to h-48 -->
                     <div class="w-1/2 relative">
                         <div class="flex items-center text-primary font-semibold mb-1">
                             <i class="fas fa-comment mr-2"></i>
                             <span>Message</span>
                         </div>
-                        <textarea id="user-input" x-model="userMessage" placeholder="Type your message..." rows="6" 
+                        <textarea id="user-input" x-model="userMessage" placeholder="Type your message..." rows="6"
                             :disabled="selectedModels.length === 0"
                             @keydown.enter.prevent="$event.shiftKey ? null : sendMessage()"
                             class="w-full bg-dark-bg-tertiary text-dark-text-primary border border-dark-border p-3 rounded-lg resize-none text-base leading-relaxed shadow-inner focus:ring-2 focus:ring-primary focus:outline-none transition-all h-64"></textarea>
-                        <div class="absolute bottom-3 right-3 text-dark-text-secondary text-xs opacity-70">Shift+Enter for new line, Enter to send</div>
+                        <div class="absolute bottom-3 right-3 text-dark-text-secondary text-xs opacity-70">Shift+Enter
+                            for new line, Enter to send</div>
                     </div>
-                    
+
                     <!-- Signoff input - doubled height from h-24 to h-48 -->
                     <div class="w-1/4">
                         <div class="flex items-center text-primary font-semibold mb-1">
                             <i class="fas fa-chevron-down mr-2"></i>
                             <span>Signoff</span>
                         </div>
-                        <textarea id="signoff-input" x-model="signoff" placeholder="Enter signoff..." rows="6" 
+                        <textarea id="signoff-input" x-model="signoff" placeholder="Enter signoff..." rows="6"
                             :disabled="selectedModels.length === 0"
                             class="w-full bg-dark-bg-tertiary text-dark-text-primary border border-dark-border p-3 rounded-lg resize-none text-base leading-relaxed shadow-inner focus:ring-2 focus:ring-primary focus:outline-none transition-all h-64"></textarea>
                     </div>
                 </div>
-                
+
                 <div class="flex gap-3">
                     <!-- Last submitted message display - doubled height from max-h-32 to max-h-64 -->
                     <div class="flex-grow">
@@ -2191,7 +2198,7 @@ create_web_interface() {
                             <i class="fas fa-history mr-2"></i>
                             Last Message:
                         </div>
-                        <div id="last-message" 
+                        <div id="last-message"
                             :class="{'italic text-dark-text-secondary': lastMessage === '', 'text-dark-text-primary': lastMessage !== ''}"
                             class="bg-dark-bg-tertiary border border-dark-border p-3 rounded-lg max-h-64 overflow-y-auto shadow-inner">
                             <template x-if="lastMessage === ''">
@@ -2202,10 +2209,10 @@ create_web_interface() {
                             </template>
                         </div>
                     </div>
-                    
+
                     <!-- Send button -->
                     <div class="flex items-end">
-                        <button @click="sendMessage()" 
+                        <button @click="sendMessage()"
                             :disabled="userMessage.trim() === '' || selectedModels.length === 0 || sendingMessage"
                             class="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg hover:shadow-xl disabled:opacity-50">
                             <i class="fas fa-paper-plane"></i>
@@ -2217,46 +2224,48 @@ create_web_interface() {
 
             <!-- Main content area with model previews -->
             <div class="flex-grow bg-dark-bg-primary overflow-hidden">
-                <div id="preview-container" 
-                    :class="getGridClass()"
-                    class="h-full p-4 grid gap-4">
+                <div id="preview-container" :class="getGridClass()" class="h-full p-4 grid gap-4">
                     <template x-if="selectedModels.length === 0">
-                        <div class="col-span-3 row-span-2 flex items-center justify-center text-dark-text-secondary text-lg">
-                            <div class="text-center p-8 rounded-lg bg-dark-bg-secondary border border-dark-border shadow-lg">
+                        <div
+                            class="col-span-3 row-span-2 flex items-center justify-center text-dark-text-secondary text-lg">
+                            <div
+                                class="text-center p-8 rounded-lg bg-dark-bg-secondary border border-dark-border shadow-lg">
                                 <i class="fas fa-robot text-6xl mb-4 text-primary opacity-50"></i>
                                 <p>Select one or more models to see responses here</p>
                             </div>
                         </div>
                     </template>
-                    
+
                     <template x-for="model in selectedModels" :key="model">
-                        <div :id="'preview-' + model" class="model-preview-panel h-full bg-dark-bg-secondary border border-dark-border rounded-lg flex flex-col shadow-md" x-data="{ viewMode: 'preview' }">
+                        <div :id="'preview-' + model"
+                            class="model-preview-panel h-full bg-dark-bg-secondary border border-dark-border rounded-lg flex flex-col shadow-md"
+                            x-data="{ viewMode: 'preview' }">
                             <div class="flex justify-between items-center p-3 border-b border-dark-border">
                                 <div class="flex items-center">
                                     <div class="model-name font-semibold text-primary" x-text="model"></div>
-                                    <div class="response-time ml-2 text-xs text-dark-text-secondary hidden bg-dark-bg-tertiary px-2 py-1 rounded-full">
+                                    <div
+                                        class="response-time ml-2 text-xs text-dark-text-secondary hidden bg-dark-bg-tertiary px-2 py-1 rounded-full">
                                         <i class="fas fa-clock mr-1"></i>
                                         <span x-text="modelResponseTimes[model] || '0ms'"></span>
                                     </div>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button @click="viewMode = 'code'" 
-                                        :class="{'opacity-50': viewMode !== 'code'}"
+                                    <button @click="viewMode = 'code'" :class="{'opacity-50': viewMode !== 'code'}"
                                         class="bg-dark-bg-tertiary hover:bg-dark-border px-3 py-1 rounded-lg text-sm transition-colors">
                                         <i class="fas fa-code"></i> Code
                                     </button>
-                                    <button @click="viewMode = 'preview'" 
+                                    <button @click="viewMode = 'preview'"
                                         :class="{'opacity-50': viewMode !== 'preview'}"
                                         class="bg-dark-bg-tertiary hover:bg-dark-border px-3 py-1 rounded-lg text-sm transition-colors">
                                         <i class="fas fa-eye"></i> Preview
                                     </button>
-                                    <button @click="saveExample(model)" 
-                                        class="save-example-btn bg-dark-bg-tertiary hover:bg-dark-border px-2 py-1 rounded-lg text-sm transition-colors ml-1" 
+                                    <button @click="saveExample(model)"
+                                        class="save-example-btn bg-dark-bg-tertiary hover:bg-dark-border px-2 py-1 rounded-lg text-sm transition-colors ml-1"
                                         title="Save as example">
                                         <i class="fas fa-save"></i>
                                     </button>
-                                    <button @click="copyToClipboard(model)" 
-                                        class="copy-btn bg-dark-bg-tertiary hover:bg-dark-border px-2 py-1 rounded-lg text-sm transition-colors ml-1" 
+                                    <button @click="copyToClipboard(model)"
+                                        class="copy-btn bg-dark-bg-tertiary hover:bg-dark-border px-2 py-1 rounded-lg text-sm transition-colors ml-1"
                                         title="Copy to clipboard">
                                         <i class="fas fa-copy"></i>
                                     </button>
@@ -2264,28 +2273,29 @@ create_web_interface() {
                             </div>
                             <div class="preview-container flex-grow overflow-hidden relative">
                                 <div class="code-view absolute inset-0 overflow-auto p-3 whitespace-pre-wrap break-words text-dark-text-secondary font-mono text-sm"
-                                    :class="{'hidden': viewMode !== 'code'}"
-                                    x-html="formatCodeView(model)">
+                                    :class="{'hidden': viewMode !== 'code'}" x-html="formatCodeView(model)">
                                 </div>
-                                <div class="content-view absolute inset-0"
-                                    :class="{'hidden': viewMode !== 'preview'}"
+                                <div class="content-view absolute inset-0" :class="{'hidden': viewMode !== 'preview'}"
                                     x-html="formatContentView(model)">
                                 </div>
                                 <div class="spinner absolute inset-0 flex items-center justify-center bg-dark-bg-secondary bg-opacity-80"
                                     :class="{'hidden': !modelLoadingStates[model]}">
                                     <div class="flex flex-col items-center">
-                                        <div class="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                                        <div
+                                            class="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4">
+                                        </div>
                                         <div class="text-dark-text-primary">Generating response...</div>
                                     </div>
                                 </div>
                             </div>
                             <!-- Remix input and button area -->
                             <div class="flex items-center p-3 border-t border-dark-border">
-                                <input type="text" x-model="remixInstructions[model]" 
+                                <input type="text" x-model="remixInstructions[model]"
                                     @keydown.enter.prevent="remixResponse(model)"
-                                    class="remix-input flex-grow bg-dark-bg-tertiary border border-dark-border text-dark-text-primary p-2 rounded-lg text-sm mr-2" 
+                                    class="remix-input flex-grow bg-dark-bg-tertiary border border-dark-border text-dark-text-primary p-2 rounded-lg text-sm mr-2"
                                     placeholder="Enter remix instructions... (Press Enter to submit)">
-                                <button @click="remixResponse(model)" class="remix-btn bg-dark-bg-tertiary hover:bg-dark-border px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-1">
+                                <button @click="remixResponse(model)"
+                                    class="remix-btn bg-dark-bg-tertiary hover:bg-dark-border px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-1">
                                     <i class="fas fa-sync-alt"></i> Remix
                                 </button>
                             </div>
@@ -2313,19 +2323,19 @@ create_web_interface() {
                 modelResponseTimes: {},
                 remixInstructions: {},
                 EXAMPLES_FILE_PATH: '/data/examples.json',
-                
+
                 init() {
                     // Initialize from local storage
                     this.preamble = localStorage.getItem('ollamaPreamble') || '';
                     this.signoff = localStorage.getItem('ollamaSignoff') || '';
                     this.fetchModels();
                 },
-                
+
                 async fetchModels() {
                     try {
                         this.loadingModels = true;
                         this.models = [];
-                        
+
                         const response = await fetch(`${this.baseUrl}/api/tags`, {
                             method: 'GET',
                             mode: 'cors',
@@ -2333,21 +2343,21 @@ create_web_interface() {
                                 'Content-Type': 'application/json'
                             }
                         });
-                        
+
                         if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }
-                        
+
                         const data = await response.json();
-                        
+
                         if (data.models && data.models.length > 0) {
                             this.models = data.models;
-                            
+
                             // Auto-select all models up to maximum of 6
                             this.selectedModels = [];
                             const modelsToSelect = this.models.slice(0, 6);
                             this.selectedModels = modelsToSelect.map(model => model.name);
-                            
+
                             // Update checkboxes to match selections
                             setTimeout(() => {
                                 modelsToSelect.forEach(model => {
@@ -2365,11 +2375,11 @@ create_web_interface() {
                         this.loadingModels = false;
                     }
                 },
-                
+
                 updateModelSelection(event) {
                     const model = event.target.value;
                     const isChecked = event.target.checked;
-                    
+
                     if (isChecked) {
                         // Limit to 6 models maximum
                         if (this.selectedModels.length >= 6) {
@@ -2382,7 +2392,7 @@ create_web_interface() {
                         this.selectedModels = this.selectedModels.filter(m => m !== model);
                     }
                 },
-                
+
                 getGridClass() {
                     if (this.selectedModels.length === 1) {
                         return 'grid-cols-1 grid-rows-1';
@@ -2397,15 +2407,15 @@ create_web_interface() {
                     }
                     return '';
                 },
-                
+
                 formatLastMessage() {
                     return this.lastMessage.replace(/\n/g, '<br>');
                 },
-                
+
                 async sendMessage() {
                     const messageText = this.userMessage.trim();
                     if (!messageText || this.selectedModels.length === 0) return;
-                    
+
                     // Combine preamble, message, and signoff
                     let fullMessage = messageText;
                     if (this.preamble.trim()) {
@@ -2414,14 +2424,14 @@ create_web_interface() {
                     if (this.signoff.trim()) {
                         fullMessage = fullMessage + '\n\n' + this.signoff.trim();
                     }
-                    
+
                     // Save preamble and signoff to localStorage
                     localStorage.setItem('ollamaPreamble', this.preamble);
                     localStorage.setItem('ollamaSignoff', this.signoff);
-                    
+
                     // Update last message
                     this.lastMessage = fullMessage;
-                    
+
                     // Add a subtle animation to the last message display
                     const lastMessageElement = document.getElementById('last-message');
                     lastMessageElement.style.transition = 'background-color 0.3s';
@@ -2429,30 +2439,30 @@ create_web_interface() {
                     setTimeout(() => {
                         lastMessageElement.style.backgroundColor = '';
                     }, 500);
-                    
+
                     // Clear input field
                     this.userMessage = '';
-                    
+
                     // Disable send button while processing
                     this.sendingMessage = true;
-                    
+
                     // Reset responses
                     this.modelResponses = {};
-                    
+
                     // Send to each selected model
                     const promises = this.selectedModels.map(model => this.sendToModel(model, fullMessage));
-                    
+
                     // Re-enable send button when all requests complete
                     Promise.all(promises).finally(() => {
                         this.sendingMessage = false;
                     });
                 },
-                
+
                 async sendToModel(model, message) {
                     // Show loading state
                     this.modelLoadingStates[model] = true;
                     this.modelResponses[model] = '';
-                    
+
                     // Mark response time as hidden
                     const panel = document.getElementById(`preview-${model}`);
                     if (panel) {
@@ -2461,7 +2471,7 @@ create_web_interface() {
                             responseTimeElement.classList.add('hidden');
                         }
                     }
-                    
+
                     // Prepare request
                     const requestOptions = {
                         method: 'POST',
@@ -2474,23 +2484,23 @@ create_web_interface() {
                             stream: false
                         })
                     };
-                    
+
                     const startTime = performance.now();
-                    
+
                     try {
                         const response = await fetch(`${this.baseUrl}/api/generate`, requestOptions);
-                        
+
                         if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }
-                        
+
                         const data = await response.json();
                         const endTime = performance.now();
                         const responseTime = Math.round(endTime - startTime);
-                        
+
                         // Update response time
                         this.modelResponseTimes[model] = `${responseTime}ms`;
-                        
+
                         // Show response time
                         if (panel) {
                             const responseTimeElement = panel.querySelector('.response-time');
@@ -2498,10 +2508,10 @@ create_web_interface() {
                                 responseTimeElement.classList.remove('hidden');
                             }
                         }
-                        
+
                         // Store response
                         this.modelResponses[model] = data.response;
-                        
+
                         // Automatically switch to preview mode when response is received
                         if (panel && panel.__x) {
                             panel.__x.$data.viewMode = 'preview';
@@ -2515,67 +2525,67 @@ create_web_interface() {
                         this.modelLoadingStates[model] = false;
                     }
                 },
-                
+
                 // Replace the existing remixResponse function with this updated version
                 async remixResponse(model) {
                     const remixInstructions = this.remixInstructions[model]?.trim();
-                    
+
                     if (!remixInstructions) {
                         this.showNotification("Please enter remix instructions", "error");
                         return;
                     }
-                    
+
                     // Get the original response from the model where the remix was requested
                     const originalResponse = this.modelResponses[model];
                     if (!originalResponse) {
                         this.showNotification(`No response to remix from ${model}`, "error");
                         return;
                     }
-                    
+
                     // Extract HTML if available, or use full response
                     const codeToRemix = this.extractHTML(originalResponse) || originalResponse;
-                    
+
                     // Apply the remix to all selected models using the source model's code
                     const promises = this.selectedModels.map(currentModel => {
                         // Build the remix prompt - using the source model's code for all models
-                        let remixPrompt = "Review the following code:" + '\n\n' + codeToRemix + '\n\n' + 
-                                        "Modify this according to the following instructions: " + remixInstructions;
-                        
+                        let remixPrompt = "Review the following code:" + '\n\n' + codeToRemix + '\n\n' +
+                            "Modify this according to the following instructions: " + remixInstructions;
+
                         // Add signoff if it exists
                         if (this.signoff.trim()) {
                             remixPrompt = remixPrompt + '\n\n' + this.signoff.trim();
                         }
-                        
+
                         // Send to each model
                         return this.sendToModel(currentModel, remixPrompt);
                     });
-                    
+
                     // Update last message
-                    this.lastMessage = "Remix instructions: " + remixInstructions + 
-                                    "\n\nSource code from: " + model;
-                    
+                    this.lastMessage = "Remix instructions: " + remixInstructions +
+                        "\n\nSource code from: " + model;
+
                     // Wait for all remix requests to complete
                     await Promise.all(promises);
-                    
+
                     // Show notification
                     this.showNotification(`Remix applied to all models using ${model}'s code`, "success");
-                    
+
                     // Clear the remix instruction only from the triggering model
                     this.remixInstructions[model] = '';
                 },
-                                
+
                 formatCodeView(model) {
                     if (!this.modelResponses[model]) {
                         return '<p class="italic text-dark-text-secondary">No response yet</p>';
                     }
-                    
+
                     // Show extracted HTML if available, or full response
                     const extractedHTML = this.extractHTML(this.modelResponses[model]);
                     const content = extractedHTML || this.modelResponses[model];
-                    
+
                     // Apply code formatting - this is the key improvement
                     let formattedContent = content;
-                    
+
                     if (extractedHTML) {
                         // Format HTML with proper indentation for better readability
                         formattedContent = this.formatHTML(extractedHTML);
@@ -2583,30 +2593,30 @@ create_web_interface() {
                         // For non-HTML content, preserve whitespace and line breaks
                         formattedContent = content;
                     }
-                    
+
                     // Escape the content for display and ensure whitespace is preserved
                     return `<pre class="whitespace-pre overflow-x-auto p-3">${this.escapeHtml(formattedContent)}</pre>`;
                 },
-                
+
                 formatContentView(model) {
                     if (!this.modelResponses[model]) {
                         return '<p class="italic text-dark-text-secondary p-3">Content preview will appear here</p>';
                     }
-                    
+
                     try {
                         // Debug information can be enabled for troubleshooting
                         if (this.debug) {
                             this.debugHtmlRendering(model);
                         }
-                        
+
                         const response = this.modelResponses[model];
-                        
+
                         // Check if we have HTML content wrapped in markdown code blocks
                         const htmlCodeBlockRegex = /```html\s*(<!DOCTYPE html>[\s\S]*?<\/html>)\s*```/;
                         const htmlMatch = response.match(htmlCodeBlockRegex);
-                        
+
                         let htmlContent = null;
-                        
+
                         if (htmlMatch && htmlMatch[1]) {
                             // Extract the HTML content from inside the code block
                             htmlContent = htmlMatch[1];
@@ -2617,32 +2627,27 @@ create_web_interface() {
                                 htmlContent = docTypeMatch[0];
                             }
                         }
-                        
+
                         if (htmlContent) {
-                            // Process the HTML to ensure it's valid
-                            const processedHTML = this.processHTMLContent(htmlContent);
-                            
-                            if (processedHTML) {
-                                // Create iframe with the processed HTML
-                                return `<div class="w-full h-full absolute inset-0">
-                                    <iframe sandbox="allow-scripts" class="w-full h-full border-0" 
-                                        srcdoc="${this.escapeHtml(processedHTML)}"></iframe>
-                                </div>`;
-                            }
+                            // Create iframe with the HTML
+                            return `<div class="w-full h-full absolute inset-0">
+                                <iframe sandbox="allow-scripts" class="w-full h-full border-0" 
+                                    srcdoc="${this.escapeHtml(htmlContent)}"></iframe>
+                            </div>`;
                         }
-                        
+
                         // If we couldn't extract or process HTML, fall back to text formatting
                         // Format markdown-style code blocks
-                        let formattedText = response.replace(/```([a-z]*)\n([\s\S]*?)```/g, 
+                        let formattedText = response.replace(/```([a-z]*)\n([\s\S]*?)```/g,
                             '<pre class="bg-dark-bg-primary rounded-lg p-3 my-3 overflow-x-auto font-mono"><code class="text-dark-text-secondary text-sm">$2</code></pre>');
-                        
+
                         // Format inline code
-                        formattedText = formattedText.replace(/`([^`]+)`/g, 
+                        formattedText = formattedText.replace(/`([^`]+)`/g,
                             '<code class="bg-dark-bg-primary px-2 py-1 rounded text-dark-text-secondary text-sm">$1</code>');
-                        
+
                         // Format line breaks
                         formattedText = formattedText.replace(/\n/g, '<br>');
-                        
+
                         return `<div class="p-4">${formattedText}</div>`;
                     } catch (error) {
                         console.error(`Error in formatContentView for model ${model}:`, error);
@@ -2662,13 +2667,13 @@ create_web_interface() {
                         console.log(`No response for model ${model}`);
                         return;
                     }
-                    
+
                     console.group(`HTML Rendering Debug: ${model}`);
-                    
+
                     // Check if there's HTML in the response
                     const hasHTML = response.includes('<!DOCTYPE html>');
                     console.log(`Contains DOCTYPE: ${hasHTML}`);
-                    
+
                     if (hasHTML) {
                         // Check for key elements
                         console.log(`Contains <head>: ${response.includes('<head>')}`);
@@ -2676,120 +2681,37 @@ create_web_interface() {
                         console.log(`Contains <body>: ${response.includes('<body')}`);
                         console.log(`Contains </body>: ${response.includes('</body>')}`);
                         console.log(`Contains tailwind.config: ${response.includes('tailwind.config')}`);
-                        
+
                         // Check script tags
                         const openScriptTags = (response.match(/<script/g) || []).length;
                         const closeScriptTags = (response.match(/<\/script>/g) || []).length;
                         console.log(`Script tags: ${openScriptTags} opening, ${closeScriptTags} closing`);
-                        
+
                         if (openScriptTags !== closeScriptTags) {
                             console.warn('Mismatched script tags detected!');
                         }
                     }
-                    
+
                     console.groupEnd();
                 },
 
                 extractHTML(text) {
                     if (!text) return null;
-                    
+
                     try {
                         // First check for HTML content that might be inside markdown code blocks
                         const htmlCodeBlockMatch = text.match(/```html\s*(<!DOCTYPE html>[\s\S]*?<\/html>)\s*```/);
                         if (htmlCodeBlockMatch && htmlCodeBlockMatch[1]) {
-                            return this.processHTMLContent(htmlCodeBlockMatch[1]);
+                            return htmlCodeBlockMatch[1];
                         }
-                        
+
                         // Then check for regular HTML content
                         const htmlMatch = text.match(/<!DOCTYPE html>[\s\S]*?<\/html>/);
                         if (!htmlMatch) return null;
-                        
-                        return this.processHTMLContent(htmlMatch[0]);
+
+                        return htmlMatch[0];
                     } catch (error) {
                         console.error('Error extracting HTML:', error);
-                        return null;
-                    }
-                },
-
-                processHTMLContent(html) {
-                    try {
-                        if (!html || !html.includes('<!DOCTYPE html>')) {
-                            console.error('Invalid HTML input:', html);
-                            return null;
-                        }
-
-                        // Extract tailwind config with improved validation
-                        let tailwindConfig = '{}';
-                        const tailwindConfigMatch = html.match(/tailwind\.config\s*=\s*(\{[\s\S]*?\})/);
-                        
-                        if (tailwindConfigMatch && tailwindConfigMatch[1]) {
-                            // Validate the tailwind config is proper JSON
-                            try {
-                                const configText = tailwindConfigMatch[1].trim();
-                                // Handle unclosed braces
-                                const openBraces = (configText.match(/\{/g) || []).length;
-                                const closeBraces = (configText.match(/\}/g) || []).length;
-                                
-                                if (openBraces === closeBraces) {
-                                    // Basic validation passed, use the config
-                                    tailwindConfig = configText;
-                                } else {
-                                    console.warn('Tailwind config has mismatched braces, using default');
-                                }
-                            } catch (e) {
-                                console.warn('Error parsing tailwind config, using default:', e);
-                            }
-                        }
-                        
-                        // Extract style content
-                        let styleContent = '';
-                        const styleMatches = html.match(/<style[^>]*>([\s\S]*?)<\/style>/g);
-                        if (styleMatches && styleMatches.length > 0) {
-                            // Extract content from all style tags and combine them
-                            styleMatches.forEach(styleTag => {
-                                const contentMatch = styleTag.match(/<style[^>]*>([\s\S]*?)<\/style>/);
-                                if (contentMatch && contentMatch[1]) {
-                                    styleContent += contentMatch[1] + '\n';
-                                }
-                            });
-                        }
-
-                        // Extract body content
-                        let bodyContent = '<body></body>';
-                        const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/);
-                        if (bodyMatch && bodyMatch[0]) {
-                            // Remove any CDN script tags from the body content
-                            bodyContent = bodyMatch[0].replace(/https:\/\/cdn[^>]*><\/script>/g, '');
-                            
-                            // Ensure the body tag is complete
-                            if (!bodyContent.includes('</body>')) {
-                                bodyContent += '</body>';
-                            }
-                        }
-                        
-                        // Using the specified string concatenation method for template creation
-                        const newHTML = "<!DOCTYPE html>" +
-                            "<html lang=\"en\">" +
-                            "<head>" +
-                                "<meta charset=\"UTF-8\">" +
-                                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                                "<title>Generated Component</title>" +
-                                "<script src=\"https://cdn.tailwindcss.com\"><\/script>" +
-                                "<script>" +
-                                    "try { tailwind.config = " + (tailwindConfig || '{}') + " } catch(e) { console.error('Tailwind config error:', e); }" +
-                                "<\/script>" +
-                                "<style>" +
-                                    styleContent +
-                                "<\/style>" +
-                                "<script defer src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js\"><\/script>" +
-                            "</head>" +
-                            (bodyContent || '<body></body>') +
-                            "</html>";
-                        
-                        // Validate the created HTML
-                        return this.validateHtml(newHTML) || newHTML;
-                    } catch (error) {
-                        console.error('Error processing HTML content:', error);
                         return null;
                     }
                 },
@@ -2799,7 +2721,7 @@ create_web_interface() {
                         // Create a DOM parser to parse the HTML string
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(html, 'text/html');
-                        
+
                         // Check for parsing errors
                         const parserErrors = doc.querySelectorAll('parsererror');
                         if (parserErrors.length > 0) {
@@ -2807,21 +2729,21 @@ create_web_interface() {
                             // Return the original HTML instead of null to ensure we always have content
                             return html;
                         }
-                        
+
                         // Check if essential script tags are present in the parsed document
                         const tailwindScript = doc.querySelector('script[src*="tailwindcss"]');
                         if (!tailwindScript) {
                             console.warn('Tailwind script is missing from the parsed document');
                         }
-                        
+
                         // Ensure the tailwind config section is valid
                         const configScripts = Array.from(doc.querySelectorAll('script'))
                             .filter(script => script.textContent.includes('tailwind.config'));
-                        
+
                         if (configScripts.length === 0) {
                             console.warn('No tailwind config script found in the parsed document');
                         }
-                        
+
                         // If no errors, return the original HTML
                         // This preserves the exact structure without modifying it through formatting
                         return html;
@@ -2835,42 +2757,42 @@ create_web_interface() {
                 // Improved HTML formatting function
                 formatHTML(html) {
                     if (!html) return '';
-                    
+
                     try {
                         // Function to recursively format HTML with proper indentation
                         function formatNode(node, level = 0) {
                             const indent = '    '.repeat(level);
                             let result = '';
-                            
+
                             // Handle different node types
-                            switch(node.nodeType) {
+                            switch (node.nodeType) {
                                 case Node.ELEMENT_NODE:
                                     // Start tag with attributes
                                     result += indent + '<' + node.nodeName.toLowerCase();
-                                    
+
                                     // Add attributes
                                     for (let i = 0; i < node.attributes.length; i++) {
                                         const attr = node.attributes[i];
                                         result += ' ' + attr.name + '="' + attr.value + '"';
                                     }
-                                    
+
                                     // Self-closing tags
                                     if (node.childNodes.length === 0 && ['img', 'br', 'hr', 'input', 'meta', 'link'].includes(node.nodeName.toLowerCase())) {
                                         result += ' />\n';
                                         return result;
                                     }
-                                    
+
                                     result += '>\n';
-                                    
+
                                     // Process children
                                     for (let i = 0; i < node.childNodes.length; i++) {
                                         result += formatNode(node.childNodes[i], level + 1);
                                     }
-                                    
+
                                     // Closing tag
                                     result += indent + '</' + node.nodeName.toLowerCase() + '>\n';
                                     break;
-                                    
+
                                 case Node.TEXT_NODE:
                                     // Only add text nodes if they contain non-whitespace content
                                     const text = node.nodeValue.trim();
@@ -2878,39 +2800,39 @@ create_web_interface() {
                                         result += indent + text + '\n';
                                     }
                                     break;
-                                    
+
                                 case Node.COMMENT_NODE:
                                     result += indent + '<!-- ' + node.nodeValue + ' -->\n';
                                     break;
-                                    
+
                                 case Node.DOCUMENT_TYPE_NODE:
                                     result += '<!DOCTYPE ' + node.name + '>\n';
                                     break;
                             }
-                            
+
                             return result;
                         }
-                        
+
                         // Parse the HTML string
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(html, 'text/html');
-                        
+
                         // Format the document
                         let result = '';
-                        
+
                         // Add DOCTYPE
                         result += '<!DOCTYPE html>\n';
-                        
+
                         // Process the HTML element
                         result += formatNode(doc.documentElement, 0);
-                        
+
                         return result;
                     } catch (error) {
                         console.error('Error formatting HTML:', error);
                         return html; // Return original on error
                     }
                 },
-                
+
                 escapeHtml(unsafe) {
                     if (!unsafe) return '';
                     return unsafe
@@ -2920,13 +2842,13 @@ create_web_interface() {
                         .replace(/"/g, "&quot;")
                         .replace(/'/g, "&#039;");
                 },
-                
+
                 copyToClipboard(model) {
                     if (!this.modelResponses[model]) return;
-                    
+
                     // Get the response
                     let content = this.modelResponses[model];
-                    
+
                     // Extract HTML if contained within markdown code block
                     const htmlCodeBlockMatch = content.match(/```html\s*(<!DOCTYPE html>[\s\S]*?<\/html>)\s*```/);
                     if (htmlCodeBlockMatch && htmlCodeBlockMatch[1]) {
@@ -2938,52 +2860,52 @@ create_web_interface() {
                             content = htmlMatch[0];
                         }
                     }
-                    
+
                     navigator.clipboard.writeText(content).then(() => {
                         // Find the button
                         const panel = document.getElementById(`preview-${model}`);
                         if (!panel) return;
-                        
+
                         const copyButton = panel.querySelector('.copy-btn');
                         if (!copyButton) return;
-                        
+
                         // Store original icon
                         const originalIcon = copyButton.innerHTML;
-                        
+
                         // Show success indicator
                         copyButton.innerHTML = '<i class="fas fa-check"></i>';
                         copyButton.classList.add('bg-primary', 'text-white');
-                        
+
                         // Reset after delay
                         setTimeout(() => {
                             copyButton.classList.remove('bg-primary', 'text-white');
                             copyButton.innerHTML = originalIcon;
                         }, 1500);
-                        
+
                         this.showNotification("Copied to clipboard", "success");
                     });
                 },
-                
+
                 async saveExample(model) {
-    if (!this.modelResponses[model]) return;
-    
-    // Extract HTML if present, otherwise use the full text
-    let contentToSave = this.modelResponses[model];
-    const htmlMatch = contentToSave.match(/<!DOCTYPE html>[\s\S]*?<\/html>/);
-    if (htmlMatch) {
-        contentToSave = htmlMatch[0];
-    }
-    
-    // Create confirmation dialog with the Alpine/Tailwind approach
-    const dialogDiv = document.createElement('div');
-    dialogDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-    
-    // Truncate preview if necessary
-    const previewContent = contentToSave.length > 200 ? 
-        contentToSave.substring(0, 200) + '...' : 
-        contentToSave;
-    
-    dialogDiv.innerHTML = `
+                    if (!this.modelResponses[model]) return;
+
+                    // Extract HTML if present, otherwise use the full text
+                    let contentToSave = this.modelResponses[model];
+                    const htmlMatch = contentToSave.match(/<!DOCTYPE html>[\s\S]*?<\/html>/);
+                    if (htmlMatch) {
+                        contentToSave = htmlMatch[0];
+                    }
+
+                    // Create confirmation dialog with the Alpine/Tailwind approach
+                    const dialogDiv = document.createElement('div');
+                    dialogDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+
+                    // Truncate preview if necessary
+                    const previewContent = contentToSave.length > 200 ?
+                        contentToSave.substring(0, 200) + '...' :
+                        contentToSave;
+
+                    dialogDiv.innerHTML = `
         <div class="bg-dark-bg-secondary rounded-lg shadow-lg p-6 max-w-lg w-full mx-4">
             <h3 class="text-lg font-bold text-primary mb-4">Confirm Save</h3>
             <p class="text-dark-text-primary mb-4">Are you sure you want to save this example?</p>
@@ -3000,113 +2922,114 @@ create_web_interface() {
             </div>
         </div>
     `;
-    
-    document.body.appendChild(dialogDiv);
-    
-    // Handle button clicks
-    document.getElementById('cancel-save').addEventListener('click', () => {
-        dialogDiv.remove();
-    });
-    
-    document.getElementById('confirm-save').addEventListener('click', async () => {
-        dialogDiv.remove();
-        
-        try {
-            // Read existing examples
-            const response = await fetch(this.EXAMPLES_FILE_PATH);
-            let examples = [];
-            
-            if (response.ok) {
-                examples = await response.json();
-            } else {
-                console.warn("Could not load existing examples, creating a new file");
-            }
-            
-            // Add new example
-            examples.push({
-                "input": this.lastMessage,
-                "output": contentToSave
-            });
-            
-            // Save updated examples
-            const saveResponse = await fetch(this.EXAMPLES_FILE_PATH, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(examples, null, 4)
-            });
-            
-            if (saveResponse.ok) {
-                // Show success visual feedback on the save button
-                const panel = document.getElementById(`preview-${model}`);
-                if (panel) {
-                    const saveButton = panel.querySelector('.save-example-btn');
-                    if (saveButton) {
-                        const originalIcon = saveButton.innerHTML;
-                        saveButton.innerHTML = '<i class="fas fa-check"></i>';
-                        saveButton.classList.add('bg-green-600', 'text-white');
-                        
-                        setTimeout(() => {
-                            saveButton.classList.remove('bg-green-600', 'text-white');
-                            saveButton.innerHTML = originalIcon;
-                        }, 1500);
-                    }
-                }
-                
-                this.showNotification("Example saved successfully!", "success");
-            } else {
-                throw new Error("Failed to save example");
-            }
-        } catch (error) {
-            console.error("Error saving example:", error);
-            this.showNotification(`Error saving example: ${error.message}`, "error");
-        }
-    });
-},
 
-showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    
-    // Set base classes
-    notification.classList.add(
-        'fixed', 'top-4', 'right-4', 'px-4', 'py-3', 
-        'rounded-lg', 'shadow-lg', 'z-50', 'flex', 
-        'items-center', 'gap-2', 'text-white'
-    );
-    
-    // Add type-specific classes
-    if (type === 'error') {
-        notification.classList.add('bg-red-600');
-        notification.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
-    } else if (type === 'success') {
-        notification.classList.add('bg-green-600');
-        notification.innerHTML = '<i class="fas fa-check-circle"></i>';
-    } else {
-        notification.classList.add('bg-primary');
-        notification.innerHTML = '<i class="fas fa-info-circle"></i>';
-    }
-    
-    // Add message
-    notification.innerHTML += `<span>${message}</span>`;
-    
-    // Add to DOM
-    document.body.appendChild(notification);
-    
-    // Add animation
-    notification.style.transition = 'opacity 0.5s, transform 0.5s';
-    
-    // Remove notification after delay
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateY(-20px)';
-        setTimeout(() => notification.remove(), 500);
-    }, 3000);
-}
-}));
-});
-</script>
+                    document.body.appendChild(dialogDiv);
+
+                    // Handle button clicks
+                    document.getElementById('cancel-save').addEventListener('click', () => {
+                        dialogDiv.remove();
+                    });
+
+                    document.getElementById('confirm-save').addEventListener('click', async () => {
+                        dialogDiv.remove();
+
+                        try {
+                            // Read existing examples
+                            const response = await fetch(this.EXAMPLES_FILE_PATH);
+                            let examples = [];
+
+                            if (response.ok) {
+                                examples = await response.json();
+                            } else {
+                                console.warn("Could not load existing examples, creating a new file");
+                            }
+
+                            // Add new example
+                            examples.push({
+                                "input": this.lastMessage,
+                                "output": contentToSave
+                            });
+
+                            // Save updated examples
+                            const saveResponse = await fetch(this.EXAMPLES_FILE_PATH, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(examples, null, 4)
+                            });
+
+                            if (saveResponse.ok) {
+                                // Show success visual feedback on the save button
+                                const panel = document.getElementById(`preview-${model}`);
+                                if (panel) {
+                                    const saveButton = panel.querySelector('.save-example-btn');
+                                    if (saveButton) {
+                                        const originalIcon = saveButton.innerHTML;
+                                        saveButton.innerHTML = '<i class="fas fa-check"></i>';
+                                        saveButton.classList.add('bg-green-600', 'text-white');
+
+                                        setTimeout(() => {
+                                            saveButton.classList.remove('bg-green-600', 'text-white');
+                                            saveButton.innerHTML = originalIcon;
+                                        }, 1500);
+                                    }
+                                }
+
+                                this.showNotification("Example saved successfully!", "success");
+                            } else {
+                                throw new Error("Failed to save example");
+                            }
+                        } catch (error) {
+                            console.error("Error saving example:", error);
+                            this.showNotification(`Error saving example: ${error.message}`, "error");
+                        }
+                    });
+                },
+
+                showNotification(message, type = 'info') {
+                    const notification = document.createElement('div');
+
+                    // Set base classes
+                    notification.classList.add(
+                        'fixed', 'top-4', 'right-4', 'px-4', 'py-3',
+                        'rounded-lg', 'shadow-lg', 'z-50', 'flex',
+                        'items-center', 'gap-2', 'text-white'
+                    );
+
+                    // Add type-specific classes
+                    if (type === 'error') {
+                        notification.classList.add('bg-red-600');
+                        notification.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+                    } else if (type === 'success') {
+                        notification.classList.add('bg-green-600');
+                        notification.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    } else {
+                        notification.classList.add('bg-primary');
+                        notification.innerHTML = '<i class="fas fa-info-circle"></i>';
+                    }
+
+                    // Add message
+                    notification.innerHTML += `<span>${message}</span>`;
+
+                    // Add to DOM
+                    document.body.appendChild(notification);
+
+                    // Add animation
+                    notification.style.transition = 'opacity 0.5s, transform 0.5s';
+
+                    // Remove notification after delay
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                        notification.style.transform = 'translateY(-20px)';
+                        setTimeout(() => notification.remove(), 500);
+                    }, 3000);
+                }
+            }));
+        });
+    </script>
 </body>
+
 </html>
 EOL
 
